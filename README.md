@@ -10,7 +10,7 @@ Repositorio backend en Node.js.
 ## Clonar el repositorio
 
 ```bash
-git clone https://github.com/milesivit/back-nodejs.git
+git clone git@github.com:milesivit/back-express.git
 cd back-nodejs
 ```
 
