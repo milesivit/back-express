@@ -12,5 +12,12 @@
     "contrasenia": "ale123",
     "email": "ale@gmail.com",
     "edad": 20
+  },
+  {
+    "id": 3,
+    "nombre": "Natalia",
+    "contrasenia": "natalia123",
+    "email": "natynvaldi@gmail.com",
+    "edad": 5
   }
 ]

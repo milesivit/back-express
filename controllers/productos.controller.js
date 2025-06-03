@@ -3,6 +3,9 @@ const fs = require('fs')
 const path = require('path')
 const filePath = path.join(__dirname, '../data/productos.json')
 
+const { Producto } = require('../models');
+const { measureMemory } = require('vm');
+
 const leerProductos = () => {
     const data = fs.readFileSync(filePath, 'utf8')
     return JSON.parse(data);
@@ -14,40 +17,54 @@ const escribirProductos = (productos) =>{
     fs.writeFileSync(filePath, JSON.stringify(productos, null, 2))
 }
 
-const getProducts = (req, res)=>{
-    res.json({data: productos
-        ,status: 200
-        ,message: 'los productos han sido obtenidos de manera axitosa'
-    })
-}
-
-const getProductById = (req, res) => {
-    const producto = productos.find(item => item.id === parseInt(req.params.id))
-    console.log(producto)
-    if (!producto) return res.json({ status: 400, message: 'producto no encontrado' })
-        res.json({ data: producto, status: 200, message: 'producto encontrado' })
-}
-
-const createProduct = (req, res) => {
-    const { nombre, precio } = req.body;
-
-    // validaciones basicas
-    if (!nombre || nombre.trim() === '') {
-        return res.status(400).json({ status: 400, message: 'El nombre no puede estar vacío.' });
+const getProducts = async (req, res) => {
+    try {
+      const productos = await Producto.findAll();
+      res.json({
+        data: productos,
+        status: 200,
+        message: 'Productos obtenidos de manera exitosa'
+      });
+    } catch (error) {
+      console.error('Error al obtener productos:', error);
+      res.status(500).json({
+        message: error.message || 'Error interno del servidor'
+      });
     }
+  };
+  
+  const getProductById = async (req, res) =>{
+    try {
+        const producto = await Producto.findByPk(req.params.id)
+        if (!producto) {
+            return res.status(404).json({ message: 'producto no encontrado'})
+        } else {
+            res.json({data: producto, status: 200, message: 'producto encontrado' })
+        }
+    } catch (error) {
+        console.error('Error al obtener producto id:', error);
+        res.status(500).json({
+          message: error.message || 'Error interno del servidor'
+        });
+    }
+  }
 
-    // crear el nuevo usuario
-    const nuevoProducto = {
-        id: productos.length + 1,
-        nombre,
-        precio,
-    };
+  const createProduct = async (req, res) => {
+    const {nombre, precio} = req.body
 
-    productos.push(nuevoProducto);
-    escribirProductos(productos)
-    res.status(201).json({ status: 201, data: nuevoProducto, message: 'Producto creado exitosamente' });
-};
-
+    try {
+        if (!nombre || !precio) {
+                return res.status(400).json({ message: 'faltan datos obligatorios'})
+        }
+        const nuevoProducto = await Producto.create({nombre, precio})
+        res.status(201).json({message: 'producto creado satisfactoriamente', data: nuevoProducto })
+    } catch (error) {
+        console.error('Error al crear producto :', error);
+        res.status(500).json({
+          message: error.message || 'Error interno del servidor'
+        });
+    }
+  }
 
 const updateProduct = (req, res) =>{
     const producto = productos.find(item => item.id === parseInt(req.params.id))

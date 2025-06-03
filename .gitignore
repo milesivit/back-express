@@ -27,3 +27,7 @@ Thumbs.db
 # Optional: build artifacts
 dist/
 build/
+
+data/db.js
+*.sqlite
+*.db
