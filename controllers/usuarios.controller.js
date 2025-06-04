@@ -65,66 +65,48 @@ const getUserById = async (req, res) =>{
     }
   }
 
-// const createUser = (req, res) => {
-//     const { nombre, contrasenia, email, edad } = req.body;
+// Editar usuario
+const updateUsuario = async (req, res) => {
+  try {
+      const usuario = await Usuario.findByPk(req.params.id);
+      if (!usuario) {
+          return res.status(404).json({ status: 404, message: 'Usuario no encontrado' });
+      }
 
-//     // validaciones basicas
-//     if (!email || email.trim() === '') {
-//         return res.status(400).json({ status: 400, message: 'El email no puede estar vacío.' });
-//     }
+      const { nombre, email, edad } = req.body;
+      usuario.nombre = nombre || usuario.nombre;
+      usuario.email = email || usuario.email;
+      usuario.edad = edad || usuario.edad;
 
-//     // verificar si el email ya existe 
-//     const emailExistente = usuarios.some(user => user.email.toLowerCase() === email.toLowerCase());
-//     if (emailExistente) {
-//         return res.status(400).json({ status: 400, message: 'El email ya está registrado.' });
-//     }
+      await usuario.save();
 
-//     // crear el nuevo usuario
-//     const nuevoUsuario = {
-//         id: usuarios.length + 1,
-//         nombre,
-//         contrasenia,
-//         email,
-//         edad
-//     };
+      res.status(200).json({ status: 200, message: 'Usuario editado exitosamente', data: usuario });
+  } catch (error) {
+      res.status(500).json({ status: 500, message: 'Error al editar usuario', error: error.message });
+  }
+};
 
-//     usuarios.push(nuevoUsuario);
-//     escribirUsuarios(usuarios)
-//     res.status(201).json({ status: 201, data: nuevoUsuario, message: 'Usuario creado exitosamente' });
-// };
+// Eliminar usuario
+const deleteUsuario = async (req, res) => {
+  try {
+      const usuario = await Usuario.findByPk(req.params.id);
+      if (!usuario) {
+          return res.status(404).json({ status: 404, message: 'Usuario no encontrado' });
+      }
 
+      await usuario.destroy();
 
-const updateUser = (req, res) =>{
-    const usuario = usuarios.find(item => item.id === parseInt(req.params.id))
-    if (!usuario) return res.json({ status: 400, message: 'usuario no encontrado' })
-    const {nombre, contrasenia, email, edad} = req.body
-    usuario.nombre = nombre || usuario.nombre
-    usuario.contrasenia = contrasenia || usuario.contrasenia
-    usuario.email = email || usuario.email
-    usuario.edad = edad || usuario.edad
+      res.status(200).json({ status: 200, message: 'Usuario eliminado exitosamente' });
+  } catch (error) {
+      res.status(500).json({ status: 500, message: 'Error al eliminar usuario', error: error.message });
+  }
+};
 
-    escribirUsuarios(usuarios)
-
-    res.json({ status: 201, message: 'usuario editado exitosamente'})
-
-}
-
-const deleteUser = (req, res) =>{
-    let usuario = usuarios.find(item => item.id === parseInt(req.params.id))
-    console.log(usuario);
-
-    if (!usuario) return res.json({ status: 404, message: 'usuario no encontrado' })
-    usuarios = usuarios.filter(item => item.id !== usuario.id)
-
-    escribirUsuarios(usuarios)
-
-    res.json({ status: 201, message: 'usuario eliminado correctamente'})
-}
 
 module.exports = {
     getUsers,
     getUserById,
-    deleteUser,
     createUser,
-    updateUser
+    deleteUsuario,
+    updateUsuario
 }
