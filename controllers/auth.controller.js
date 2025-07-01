@@ -5,7 +5,7 @@ const { Usuario } = require('../models');
 //registrar nuevo usuario
 const register = async (req, res) => {
         
-    const { nombre, email, edad, contrasenia } = req.body;                
+    const { nombre, email, edad, contrasenia, role} = req.body;                
     
     try {
         const userExist = await Usuario.findOne({
@@ -23,7 +23,8 @@ const register = async (req, res) => {
             nombre,
             email,
             edad,
-            contrasenia: hashContrasenia
+            contrasenia: hashContrasenia,
+            role: role || 'cliente'
         })
 
         res.status(201).json({ message: 'Usuario creado exitosamente', data: user });
@@ -56,7 +57,7 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Contraseña incorrecta' });
         }
 
-        const token = jwt.sign({ id: user.id }, 'secreto1234', { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.id, role: user.role }, 'secreto1234', { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
     } catch (error) {

@@ -18,6 +18,9 @@ app.use('/productos', userRouterProduct)
 const ventaRouter = require('./routes/ventas.routes')
 app.use('/ventas', ventaRouter)
 
+const authRouter = require('./routes/auth.routes')
+app.use('/auth', authRouter)
+
 app.listen(port, () =>{
     console.log(`servidor corriendo en el localhost:${port}`)
 })
